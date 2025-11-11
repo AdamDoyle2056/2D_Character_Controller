@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46d6d69ff92432f418400e4cef0d6e40, type: 3}
   m_Name: PlatformA
   m_EditorClassIdentifier: 
-  speed: 0
+  speed: 4
+  invertTime: 0.35
