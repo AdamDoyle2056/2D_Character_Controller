@@ -66,5 +66,9 @@ namespace CharacterController
 
         [Tooltip("The amount of time we buffer a jump. This allows jump input before actually hitting the ground")]
         public float JumpBuffer = .2f;
+
+        [Header("SHOOTING")]
+        [Tooltip("The immediate veolicty applied to the opposite direction of a shot")]
+        public float ShotJumpPower = 20;
     } 
 }
