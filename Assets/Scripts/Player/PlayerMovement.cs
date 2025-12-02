@@ -30,9 +30,6 @@ public class PlayerMovement : MonoBehaviour
     private bool _coyoteUsable;
     private float _timeJumpWasPressed;
 
-    private bool _shotJumpToConsume;
-    private bool _isShotJump;
-
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -53,11 +50,6 @@ public class PlayerMovement : MonoBehaviour
             _jumpToConsume = true;          // Mark that a jump input occurred 
             _timeJumpWasPressed = _time;    // Record the exact time the jump button was pressed 
         }
-
-        if (_input.Current.ShootDown)
-        {
-            _shotJumpToConsume = true;      // Mark that a shot jump input occured
-        }
     }
 
     private void FixedUpdate()
@@ -65,7 +57,6 @@ public class PlayerMovement : MonoBehaviour
         // Important physics checking occurs at a fixed time step
         CheckCollisions();
 
-        HandleShotJump();
         HandleJump();
         HandleDirection();
         HandleGravity();
@@ -108,20 +99,6 @@ public class PlayerMovement : MonoBehaviour
         Physics2D.queriesStartInColliders = _cachedQueryStartInColliders;
     }
 
-    private void HandleShotJump()
-    {   
-        // Execute the shot jump
-        if (_shotJumpToConsume)
-        {   
-            _frameVelocity.y = _stats.ShotJumpPower;   
-            _isShotJump = true;
-        }
-
-        // Consume the shot jump input so it doesn’t trigger again next frame
-        _shotJumpToConsume = false;
-    }
-
-
     // Checks if player can jump given there is a buffered jump avaiable and jump input occured recently
     private bool HasBufferedJump => _bufferedJumpUsable && _time < _timeJumpWasPressed + _stats.JumpBuffer;
 
@@ -153,7 +130,6 @@ public class PlayerMovement : MonoBehaviour
         _coyoteUsable = false;                  // Consume coyote time — it can’t be reused after jumping
         _frameVelocity.y = _stats.JumpPower;    // Apply upward velocity to make the player jump
         Jumped?.Invoke();                       // Fire the Jumped event for other systems 
-        _isShotJump = false;
     }
 
     private void HandleDirection()
@@ -185,7 +161,7 @@ public class PlayerMovement : MonoBehaviour
             float gravity = _stats.FallAcceleration;
 
             // If the player released the jump early while moving upward, increase gravity to shorten the jump
-            if (!_isShotJump && _endedJumpEarly && _frameVelocity.y > 0)
+            if (_endedJumpEarly && _frameVelocity.y > 0)
                 gravity *= _stats.JumpEndEarlyGravityModifier;
 
             // Apply gravity toward maximum fall speed smoothly
