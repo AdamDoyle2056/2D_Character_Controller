@@ -169,7 +169,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyMovement()
     {   
-        // Apply calcualted movement to player rigidbody
+        // Apply calcualted movement to player rigidbody.
         _rb.velocity = _frameVelocity;
     }
 }
