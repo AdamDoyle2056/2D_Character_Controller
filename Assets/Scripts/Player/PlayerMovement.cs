@@ -3,6 +3,7 @@ using UnityEngine;
 using CharacterController;
 using Unity.VisualScripting;
 using UnityEditor.Callbacks;
+using UnityEditor;
 
 // Automatically adds rb and capcollider IF none on player
 [RequireComponent(typeof(Rigidbody2D), typeof(CapsuleCollider2D))]
@@ -11,6 +12,9 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private ScriptableStats _stats;
     [SerializeField] private PlayerInput _input;
+
+    private Transform _currentPlatform;
+    private Vector3 _lastPlatformPos;
 
     private Rigidbody2D _rb;
     private CapsuleCollider2D _col;
@@ -69,8 +73,10 @@ public class PlayerMovement : MonoBehaviour
         // Enabling raycast to start in colliders and not trigger
         Physics2D.queriesStartInColliders = false;
 
-        // Both raycast are determined by the size of the collider
-        bool groundHit = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.down, _stats.GrounderDistance, ~_stats.PlayerLayer);
+        // Raycast checks
+        RaycastHit2D hit = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.down, _stats.GrounderDistance, ~_stats.PlayerLayer);
+        bool groundHit = hit.collider != null;
+
         bool ceilingHit = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.up, _stats.GrounderDistance, ~_stats.PlayerLayer);
 
         // If the player hits the ceiling stop vertical velocity
@@ -80,11 +86,21 @@ public class PlayerMovement : MonoBehaviour
         // If the player was not grounded before but is now touching the ground
         if (!_grounded && groundHit)
         {
-            _grounded = true;                             // Mark the player as grounded
-            _coyoteUsable = true;                         // Reset coyote time availability
-            _bufferedJumpUsable = true;                   // Allowed jump
-            _endedJumpEarly = false;                      // Reset jump state (no early release)
+            _grounded = true;                                           // Mark the player as grounded
+            _coyoteUsable = true;                                       // Reset coyote time availability
+            _bufferedJumpUsable = true;                                 // Allowed jump
+            _endedJumpEarly = false;                                    // Reset jump state (no early release)
             GroundedChanged?.Invoke(true, Mathf.Abs(_frameVelocity.y)); // Trigger grounded event with landing speed
+
+            // Moving platform detection
+            Transform platform = hit.collider.transform;
+
+            if (platform != _currentPlatform)
+            {   
+                // Updating platform information
+                _currentPlatform = platform;
+                _lastPlatformPos = _currentPlatform.position;
+            }
         }
 
         // If the player was grounded before but has now left the ground
@@ -93,6 +109,7 @@ public class PlayerMovement : MonoBehaviour
             _grounded = false;                            // Mark the player as airborne
             _frameLeftGrounded = _time;                   // Record the time they left the ground (for coyote time)
             GroundedChanged?.Invoke(false, 0);            // Trigger event for leaving the ground
+            _currentPlatform = null;                      // No longer need a current platform
         }
 
         // Disabling raycast to start in colliders and not trigger
@@ -171,6 +188,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyMovement()
     {   
+        if(_currentPlatform != null)        // If player is on a platform, add platform velocity to player
+        {
+            Vector3 platformDelta = _currentPlatform.position - _lastPlatformPos;
+            Vector2 platformVelocity = platformDelta / Time.fixedDeltaTime;
+            _frameVelocity += platformVelocity;
+            _lastPlatformPos = _currentPlatform.position;
+        }
+
         // Apply calcualted movement to player rigidbody.
         _rb.velocity = _frameVelocity;
     }
