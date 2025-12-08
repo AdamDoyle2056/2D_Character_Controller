@@ -8,6 +8,9 @@ Designed as a **template** or **starting point** for platformer games, with clea
 
 ## Preview  
 ![Left-Right animation](Gifs/LeftRight/LeftRight.gif)
+![JumpHeight animation](Gifs/JumpHeight/JumpHeight.gif)
+![Collisions animation](Gifs/Collisions/Collisions.gif)
+![CoyoteTime animation](Gifs/CoyoteTime/CoyoteTime.gif)
 
 ---
 
