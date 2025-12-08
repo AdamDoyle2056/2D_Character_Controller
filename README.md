@@ -7,7 +7,7 @@ Designed as a **template** or **starting point** for platformer games, with clea
 ---
 
 ## Preview  
-*(GIFS to come here)*
+![Left-Right animation](Gifs/LeftRight/LeftRight.gif)
 
 ---
 
