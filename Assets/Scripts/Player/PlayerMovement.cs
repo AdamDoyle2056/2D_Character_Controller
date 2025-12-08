@@ -4,9 +4,10 @@ using CharacterController;
 using Unity.VisualScripting;
 using UnityEditor.Callbacks;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 // Automatically adds rb and capcollider IF none on player
-[RequireComponent(typeof(Rigidbody2D), typeof(CapsuleCollider2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _lastPlatformPos;
 
     private Rigidbody2D _rb;
-    private CapsuleCollider2D _col;
+    private BoxCollider2D _col;
     private Vector2 _frameVelocity;
     private float _time;
     private bool _cachedQueryStartInColliders;
@@ -37,7 +38,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
-        _col = GetComponent<CapsuleCollider2D>();
+        _col = GetComponent<BoxCollider2D>();
 
         // Bool for ignoring raycast hits inside a collider
         _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
@@ -73,11 +74,31 @@ public class PlayerMovement : MonoBehaviour
         // Enabling raycast to start in colliders and not trigger
         Physics2D.queriesStartInColliders = false;
 
-        // Raycast checks
-        RaycastHit2D hit = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.down, _stats.GrounderDistance, ~_stats.PlayerLayer);
+        // Calculate values for BoxCast
+        Vector2 boxSize = _col.size;
+        Vector2 boxCenter = (Vector2)_col.bounds.center;
+
+        // Ground check
+        RaycastHit2D hit = Physics2D.BoxCast(
+            boxCenter,
+            boxSize,
+            0f,                    
+            Vector2.down,
+            _stats.GrounderDistance,
+            ~_stats.PlayerLayer
+        );
+
         bool groundHit = hit.collider != null;
 
-        bool ceilingHit = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.up, _stats.GrounderDistance, ~_stats.PlayerLayer);
+        // Ceiling check
+        bool ceilingHit = Physics2D.BoxCast(
+            boxCenter,
+            boxSize,
+            0f,
+            Vector2.up,
+            _stats.GrounderDistance,
+            ~_stats.PlayerLayer
+        );
 
         // If the player hits the ceiling stop vertical velocity
         if (ceilingHit)
