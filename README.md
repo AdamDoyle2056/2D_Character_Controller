@@ -36,7 +36,7 @@ Designed as a **template** or **starting point** for platformer games, with clea
 - Smooth left/right movement  
 - Jumping with adjustable jump height  
 - Kinematic Rigidbody2D-driven physics  
-- Ground detection using CapsuleCast  
+- Ground detection using BoxCast (can refactor to CapsuleCast)  
 - Clean separation of input & physics
 
 ### Extensible System
