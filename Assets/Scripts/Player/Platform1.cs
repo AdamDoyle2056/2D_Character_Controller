@@ -7,17 +7,25 @@ public class MovingPlatform : MonoBehaviour
     public float speed = 2f;
 
     private Vector3 target;
+    private Rigidbody2D rb;
 
-    void Start()
+    void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
         target = pointB;
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+        Vector2 newPos = Vector2.MoveTowards(
+            rb.position,
+            target,
+            speed * Time.fixedDeltaTime
+        );
 
-        if (Vector3.Distance(transform.position, target) < 0.1f)
+        rb.MovePosition(newPos);
+
+        if (Vector2.Distance(rb.position, target) < 0.05f)
         {
             target = (target == pointA) ? pointB : pointA;
         }
