@@ -6,10 +6,26 @@ Designed as a **template** or **starting point** for platformer games, with clea
 
 ---
 
-## Preview  
+## Preview
+
+---
+
+### Left / Right Movement  
 ![Left-Right animation](Gifs/LeftRight/LeftRight.gif)
+
+---
+
+### Jump Height  
 ![JumpHeight animation](Gifs/JumpHeight/JumpHeight.gif)
+
+---
+
+### Collision Detection  
 ![Collisions animation](Gifs/Collisions/Collisions.gif)
+
+---
+
+### Coyote Time  
 ![CoyoteTime animation](Gifs/CoyoteTime/CoyoteTime.gif)
 
 ---
